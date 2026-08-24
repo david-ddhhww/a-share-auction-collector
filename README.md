@@ -68,6 +68,8 @@ logs/YYYY-MM-DD.log
 
 ## 零成本云端运行
 
+公开仓库：<https://github.com/Kevinhuang287/a-share-auction-collector>
+
 仓库内置 `.github/workflows/daily-auction.yml`。GitHub Actions 在工作日北京时间 09:10、09:15、09:20、09:25 发起冗余调度，真正采集只允许发生在已经验证的 09:26:05–09:28:59 窗口。首个任务会等待窗口，后续任务发现当日已有合格报告后直接退出。
 
 云端入口：
