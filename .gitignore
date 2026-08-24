@@ -2,9 +2,9 @@
 __pycache__/
 *.py[cod]
 .pytest_cache/
-data/
-database/
+.pytest-tmp/
 logs/
 raw/
 state/
-
+database/*.db-wal
+database/*.db-shm

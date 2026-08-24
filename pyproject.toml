@@ -4,13 +4,14 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "a-share-auction-collector"
-version = "0.1.0"
+version = "0.2.0"
 description = "A-share 09:25 opening call-auction collector"
 requires-python = ">=3.11"
 dependencies = ["requests>=2.32,<3"]
 
 [project.scripts]
 auction-collector = "auction_collector.cli:main"
+auction-cloud-run = "auction_collector.cloud_run:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -18,4 +19,3 @@ where = ["src"]
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 testpaths = ["tests"]
-

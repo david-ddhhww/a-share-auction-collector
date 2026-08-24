@@ -66,6 +66,38 @@ logs/YYYY-MM-DD.log
 
 `report.json` 是下游 AI 生成竞价快报的统一入口。原始响应不可变保存；同日同股票使用 SQLite 主键幂等覆盖，不重复计数。
 
+## 零成本云端运行
+
+仓库内置 `.github/workflows/daily-auction.yml`。GitHub Actions 在工作日北京时间 09:10、09:15、09:20、09:25 发起冗余调度，真正采集只允许发生在已经验证的 09:26:05–09:28:59 窗口。首个任务会等待窗口，后续任务发现当日已有合格报告后直接退出。
+
+云端入口：
+
+```bash
+auction-cloud-run --root .
+```
+
+只有质量为 `good` 或 `warning`、有效股票数和全 A 竞价额均大于零的报告才会更新 `latest/`。`poor`、空数据、节假日或错过窗口时任务失败或跳过，绝不覆盖上一份成功报告。GitHub Actions 仅提交 `data/`、`database/` 与 `latest/`；原始响应、日志和临时状态不进入公开仓库。
+
+公开网站读取稳定地址：
+
+```text
+https://raw.githubusercontent.com/Kevinhuang287/a-share-auction-collector/main/latest/report.json
+```
+
+首次实盘任务运行前，该文件不存在是正常状态，网站必须显示“等待首份合格报告”，不得填模拟值。
+
+## 以后迁移到 Linux 服务器
+
+迁移时不改采集算法、SQLite 表、每日输出或 `latest/report.json` 契约，只把 GitHub Actions 替换为仓库已提供的 systemd timer 或 cron：
+
+1. 把仓库与 `data/`、`database/` 复制到服务器。
+2. 安装 Python 3.11 和项目依赖。
+3. 让 systemd/cron 在 Asia/Shanghai 09:26 调用 `auction-cloud-run --root <项目目录>`。
+4. 用 Nginx、对象存储或仓库同步继续公开 `latest/report.json`。
+5. 网站只需把报告 URL 改到新地址；数据字段和页面无需重写。
+
+GitHub Actions 的定时调度不是严格实时 SLA，可能被平台延迟；服务器迁移路线主要用于需要更稳定 09:26 启动时间的阶段。
+
 ## 质量和停止规则
 
 - 缺失率 `<1%` 为 `good`，`1%–3%` 为 `warning`，`>3%` 为 `poor`。
@@ -86,4 +118,3 @@ python -m compileall -q src
 ## systemd 部署
 
 模板位于 `deploy/systemd/`。服务器需先恢复 SSH，随后按 [部署说明](docs/部署说明.md) 安装。定时器故意设置 `Persistent=false`，避免机器在盘后恢复时误用全天累计成交额补跑批量快照。
-
