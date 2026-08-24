@@ -1,0 +1,13 @@
+[Unit]
+Description=Run A-share auction collector at 09:26 China time on weekdays
+
+[Timer]
+OnCalendar=Mon..Fri *-*-* 09:26:00 Asia/Shanghai
+AccuracySec=1s
+RandomizedDelaySec=0
+Persistent=false
+Unit=a-share-auction-collector.service
+
+[Install]
+WantedBy=timers.target
+

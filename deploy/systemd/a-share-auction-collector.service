@@ -1,0 +1,17 @@
+[Unit]
+Description=A-share 09:25 opening call-auction collector
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/home/ubuntu/a-share-auction-collector
+ExecStart=/home/ubuntu/a-share-auction-collector/.venv/bin/python -m auction_collector --root /home/ubuntu/a-share-auction-collector --mode auto
+Environment=PYTHONUNBUFFERED=1
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/ubuntu/a-share-auction-collector/data /home/ubuntu/a-share-auction-collector/database /home/ubuntu/a-share-auction-collector/logs /home/ubuntu/a-share-auction-collector/raw /home/ubuntu/a-share-auction-collector/state
+
